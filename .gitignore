@@ -55,3 +55,10 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Ignore Visual Studio temporary indices and Copilot caches
+.vs/
+CopilotIndices/
+Designtime Indices/
+FileContentIndex/
+Project Evaluation/
