@@ -7,6 +7,7 @@ public interface IShiftService
     Task<Result<IReadOnlyList<ShiftResponseDto>>> ListAsync(
         Guid practiceId,
         CallerContext caller,
+        string? status = null,
         CancellationToken ct = default
     );
     Task<Result<ShiftResponseDto>> GetAsync(

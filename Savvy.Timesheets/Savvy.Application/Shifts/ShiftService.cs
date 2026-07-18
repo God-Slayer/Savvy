@@ -28,6 +28,7 @@ public sealed class ShiftService(IUnitOfWork uow) : IShiftService
     public async Task<Result<IReadOnlyList<ShiftResponseDto>>> ListAsync(
         Guid practiceId,
         CallerContext caller,
+        string? status = null,
         CancellationToken ct = default
     )
     {
@@ -40,7 +41,22 @@ public sealed class ShiftService(IUnitOfWork uow) : IShiftService
         }
         if (!Manager(caller, practiceId))
             return Deny<IReadOnlyList<ShiftResponseDto>>();
-        var practiceShifts = await uow.Shifts.ListByPracticeAsync(practiceId, ct);
+        ShiftStatus? parsedStatus = null;
+        if (
+            !string.IsNullOrWhiteSpace(status)
+            && !status.Equals("all", StringComparison.OrdinalIgnoreCase)
+            && (!Enum.TryParse(status, true, out ShiftStatus value))
+        )
+            return Result<IReadOnlyList<ShiftResponseDto>>.Failure(
+                "validation",
+                "Invalid shift status. Use All, Open, or Completed."
+            );
+        if (
+            !string.IsNullOrWhiteSpace(status)
+            && !status.Equals("all", StringComparison.OrdinalIgnoreCase)
+        )
+            parsedStatus = Enum.Parse<ShiftStatus>(status, true);
+        var practiceShifts = await uow.Shifts.ListByPracticeAsync(practiceId, parsedStatus, ct);
         return Result<IReadOnlyList<ShiftResponseDto>>.Success(practiceShifts.Select(Map).ToList());
     }
 

@@ -8,6 +8,14 @@ public sealed class TimesheetRepository(TimesheetsDbContext dbContext)
     : Repository<Timesheet>(dbContext),
         ITimesheetRepository
 {
+    public Task<IReadOnlyList<Timesheet>> GetByPracticeAsync(
+        Guid practiceId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return GetByPracticeAsync(practiceId, null, cancellationToken);
+    }
+
     public Task<Timesheet?> GetByBusinessReferenceAsync(
         string businessReference,
         CancellationToken cancellationToken = default
@@ -29,6 +37,44 @@ public sealed class TimesheetRepository(TimesheetsDbContext dbContext)
         return Entities
             .AsNoTracking()
             .FirstOrDefaultAsync(timesheet => timesheet.ShiftId == shiftId, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Timesheet>> GetByPracticeAsync(
+        Guid practiceId,
+        TimesheetStatus? status = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await Entities
+            .Include(timesheet => timesheet.Shift)
+            .AsNoTracking()
+            .Where(timesheet =>
+                timesheet.Shift != null
+                && timesheet.Shift.PracticeId == practiceId
+                && !timesheet.IsDeleted
+                && (status == null || timesheet.Status == status)
+            )
+            .OrderByDescending(timesheet => timesheet.ActualStartUtc)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Timesheet>> GetByClinicianAsync(
+        Guid clinicianId,
+        TimesheetStatus? status,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await Entities
+            .Include(timesheet => timesheet.Shift)
+            .AsNoTracking()
+            .Where(timesheet =>
+                timesheet.Shift != null
+                && timesheet.Shift.ClinicianId == clinicianId
+                && !timesheet.IsDeleted
+                && (status == null || timesheet.Status == status)
+            )
+            .OrderByDescending(timesheet => timesheet.ActualStartUtc)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<IReadOnlyList<Timesheet>> GetApprovedForPaymentAsync(

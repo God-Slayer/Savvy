@@ -16,6 +16,17 @@ public interface ITimesheetService
         CallerContext caller,
         CancellationToken ct = default
     );
+    Task<Result<IReadOnlyList<TimesheetResponseDto>>> ListByPracticeAsync(
+        Guid practiceId,
+        CallerContext caller,
+        string? status = null,
+        CancellationToken ct = default
+    );
+    Task<Result<IReadOnlyList<TimesheetResponseDto>>> ListMineAsync(
+        CallerContext caller,
+        string? status = null,
+        CancellationToken ct = default
+    );
     Task<Result<TimesheetResponseDto>> ApproveAsync(
         Guid id,
         CallerContext caller,

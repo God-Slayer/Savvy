@@ -8,15 +8,24 @@ public sealed class ShiftRepository(TimesheetsDbContext dbContext)
     : Repository<Shift>(dbContext),
         IShiftRepository
 {
+    public Task<IReadOnlyList<Shift>> ListByPracticeAsync(
+        Guid practiceId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return ListByPracticeAsync(practiceId, null, cancellationToken);
+    }
+
     public async Task<IReadOnlyList<Shift>> ListByPracticeAsync(
         Guid practiceId,
+        ShiftStatus? status = null,
         CancellationToken cancellationToken = default
     )
     {
         return await Entities
             .AsNoTracking()
             .Include(x => x.Clinician)
-            .Where(x => x.PracticeId == practiceId)
+            .Where(x => x.PracticeId == practiceId && (status == null || x.Status == status))
             .OrderBy(x => x.ScheduledStartUtc)
             .ToListAsync(cancellationToken);
     }

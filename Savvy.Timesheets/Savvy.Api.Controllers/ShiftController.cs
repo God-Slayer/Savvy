@@ -10,9 +10,13 @@ public sealed class ShiftController(IShiftService service) : ControllerBase
 {
     [HttpGet("api/practices/{practiceId:guid}/shifts")]
     /// <summary>Lists shifts visible to the authenticated caller for a practice.</summary>
-    public async Task<IActionResult> List(Guid practiceId, CancellationToken ct)
+    public async Task<IActionResult> List(
+        Guid practiceId,
+        [FromQuery] string? status,
+        CancellationToken ct
+    )
     {
-        var r = await service.ListAsync(practiceId, Context(), ct);
+        var r = await service.ListAsync(practiceId, Context(), status, ct);
         return Respond(r);
     }
 

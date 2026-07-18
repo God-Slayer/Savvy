@@ -187,6 +187,11 @@ public sealed class WorkflowTests
         public Task<Timesheet?> GetByShiftIdAsync(Guid id, CancellationToken c = default) =>
             Task.FromResult<Timesheet?>(null);
 
+        public Task<IReadOnlyList<Timesheet>> GetByPracticeAsync(
+            Guid practiceId,
+            CancellationToken c = default
+        ) => Task.FromResult<IReadOnlyList<Timesheet>>(Added);
+
         public Task<IReadOnlyList<Timesheet>> GetApprovedForPaymentAsync(
             Guid p,
             DateOnly s,

@@ -29,6 +29,24 @@ public sealed class TimesheetController(ITimesheetService service) : ControllerB
         return Respond(await service.GetAsync(id, Ctx(), ct));
     }
 
+    [HttpGet("api/practices/{practiceId:guid}/timesheets")]
+    /// <summary>Lists all timesheets for a practice for administrators and practice managers.</summary>
+    public async Task<IActionResult> ListByPractice(
+        Guid practiceId,
+        [FromQuery] string? status,
+        CancellationToken ct
+    )
+    {
+        return Respond(await service.ListByPracticeAsync(practiceId, Ctx(), status, ct));
+    }
+
+    [HttpGet("api/me/timesheets")]
+    /// <summary>Lists the authenticated clinician's own timesheets with an optional status filter.</summary>
+    public async Task<IActionResult> ListMine([FromQuery] string? status, CancellationToken ct)
+    {
+        return Respond(await service.ListMineAsync(Ctx(), status, ct));
+    }
+
     [HttpPost("api/timesheets/{id:guid}/approve")]
     /// <summary>Approves a submitted timesheet for a manager or administrator.</summary>
     public async Task<IActionResult> Approve(Guid id, CancellationToken ct)

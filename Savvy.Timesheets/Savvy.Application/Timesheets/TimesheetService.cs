@@ -92,6 +92,83 @@ public sealed class TimesheetService(
         return Result<TimesheetResponseDto>.Success(ToDto(t, s));
     }
 
+    public async Task<Result<IReadOnlyList<TimesheetResponseDto>>> ListByPracticeAsync(
+        Guid practiceId,
+        CallerContext c,
+        string? status = null,
+        CancellationToken ct = default
+    )
+    {
+        if (c.Role is not (UserRole.Admin or UserRole.PracticeManager))
+            return Result<IReadOnlyList<TimesheetResponseDto>>.Failure(
+                "forbidden",
+                "Only managers or admins may list practice timesheets."
+            );
+        if (c.Role == UserRole.PracticeManager && c.PracticeId != practiceId)
+            return Result<IReadOnlyList<TimesheetResponseDto>>.Failure(
+                "forbidden",
+                "Outside practice scope."
+            );
+
+        TimesheetStatus? parsedStatus = null;
+        if (
+            !string.IsNullOrWhiteSpace(status)
+            && !status.Equals("all", StringComparison.OrdinalIgnoreCase)
+            && !Enum.TryParse(status, true, out TimesheetStatus value)
+        )
+            return Result<IReadOnlyList<TimesheetResponseDto>>.Failure(
+                "validation",
+                "Invalid timesheet status. Use All, Submitted, Approved, or Paid."
+            );
+        if (
+            !string.IsNullOrWhiteSpace(status)
+            && !status.Equals("all", StringComparison.OrdinalIgnoreCase)
+        )
+            parsedStatus = Enum.Parse<TimesheetStatus>(status, true);
+        var records = await timesheets.GetByPracticeAsync(practiceId, parsedStatus, ct);
+        var response = records
+            .Where(timesheet => timesheet.Shift is not null)
+            .Select(timesheet => ToDto(timesheet, timesheet.Shift!))
+            .ToList();
+        return Result<IReadOnlyList<TimesheetResponseDto>>.Success(response);
+    }
+
+    public async Task<Result<IReadOnlyList<TimesheetResponseDto>>> ListMineAsync(
+        CallerContext c,
+        string? status = null,
+        CancellationToken ct = default
+    )
+    {
+        if (c.Role != UserRole.Clinician)
+            return Result<IReadOnlyList<TimesheetResponseDto>>.Failure(
+                "forbidden",
+                "Only clinicians may list their own timesheets."
+            );
+
+        TimesheetStatus? parsedStatus = null;
+        if (
+            !string.IsNullOrWhiteSpace(status)
+            && !status.Equals("all", StringComparison.OrdinalIgnoreCase)
+            && !Enum.TryParse(status, true, out TimesheetStatus value)
+        )
+            return Result<IReadOnlyList<TimesheetResponseDto>>.Failure(
+                "validation",
+                "Invalid timesheet status. Use All, Submitted, Approved, or Paid."
+            );
+        if (
+            !string.IsNullOrWhiteSpace(status)
+            && !status.Equals("all", StringComparison.OrdinalIgnoreCase)
+        )
+            parsedStatus = Enum.Parse<TimesheetStatus>(status, true);
+
+        var records = await timesheets.GetByClinicianAsync(c.UserId, parsedStatus, ct);
+        var response = records
+            .Where(timesheet => timesheet.Shift is not null)
+            .Select(timesheet => ToDto(timesheet, timesheet.Shift!))
+            .ToList();
+        return Result<IReadOnlyList<TimesheetResponseDto>>.Success(response);
+    }
+
     public async Task<Result<TimesheetResponseDto>> ApproveAsync(
         Guid id,
         CallerContext c,
