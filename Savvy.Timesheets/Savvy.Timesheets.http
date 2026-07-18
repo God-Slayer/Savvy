@@ -1,6 +1,0 @@
-@Savvy.Timesheets_HostAddress = http://localhost:5138
-
-GET {{Savvy.Timesheets_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
