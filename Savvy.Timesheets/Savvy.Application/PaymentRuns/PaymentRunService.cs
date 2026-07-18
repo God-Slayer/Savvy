@@ -129,8 +129,14 @@ public sealed class PaymentRunService(
             return Result<PaymentRunResponseDto>.Failure("forbidden", "Forbidden.");
         if (r.Status == PaymentRunStatus.Processed)
             return Result<PaymentRunResponseDto>.Success(ToDto(r));
+        // Reload only the payment-run entity before updating so EF does not
+        // attempt to update its already-persisted line and navigation graph.
+        var runToUpdate = await runs.GetByIdAsync(id, ct);
+        if (runToUpdate is null)
+            return Result<PaymentRunResponseDto>.Failure("not_found", "Payment run not found.");
+        runToUpdate.Status = PaymentRunStatus.Processed;
+        runs.Update(runToUpdate);
         r.Status = PaymentRunStatus.Processed;
-        runs.Update(r);
         await uow.SaveChangesAsync(ct);
         return Result<PaymentRunResponseDto>.Success(ToDto(r));
     }
