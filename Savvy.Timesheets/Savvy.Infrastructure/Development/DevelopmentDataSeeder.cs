@@ -108,14 +108,12 @@ public sealed class DevelopmentDataSeeder(
             cancellationToken
         );
 
-        var run =
-            await dbContext
-                .PaymentRuns.IgnoreQueryFilters()
-                .FirstOrDefaultAsync(x => x.Id == PaymentRunId, cancellationToken)
-            ?? new PaymentRun { Id = PaymentRunId };
+        var run = await dbContext.PaymentRuns.IgnoreQueryFilters()
+            .FirstOrDefaultAsync(x => x.Id == PaymentRunId, cancellationToken);
+        run ??= new PaymentRun { Id = PaymentRunId };
         run.PracticeId = practice.Id;
         run.BusinessReference = "DEMO-PR-001";
-        run.RequestHash = "demo";
+        run.RequestHash = "DEMO-PR-001";
         run.PeriodStartDate = new DateOnly(2026, 7, 18);
         run.PeriodEndDate = new DateOnly(2026, 7, 18);
         run.PercentageFeeRate = 0m;
@@ -124,7 +122,7 @@ public sealed class DevelopmentDataSeeder(
         run.TotalFeeAmount = 0m;
         run.TotalNetAmount = 360m;
         run.Currency = "GBP";
-        run.Status = PaymentRunStatus.Draft;
+        run.Status = PaymentRunStatus.Processed;
         if (dbContext.Entry(run).State == EntityState.Detached)
             dbContext.PaymentRuns.Add(run);
         var line =
