@@ -28,6 +28,7 @@ public sealed class DevelopmentDataSeeder(
     private static readonly Guid PaymentRunId = Guid.Parse("D1E5D67A-4811-48F7-9C5C-C55742E692EF");
     private static readonly Guid PaymentLineId = Guid.Parse("EB238144-8670-4765-952C-530984FEA70E");
 
+    /// <summary>Creates or synchronizes the stable demo users, shifts, timesheets, and payment data.</summary>
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
         var password = configuration["DevelopmentSeed:DemoPassword"];

@@ -6,6 +6,7 @@ using Savvy.Domain;
 namespace Savvy.Api.Controllers;
 
 [ApiController]
+/// <summary>Exposes practice-level reporting summaries.</summary>
 public sealed class ReportingController(IReportingService service) : ControllerBase
 {
     [HttpGet("api/practices/{practiceId:guid}/reports/summary")]

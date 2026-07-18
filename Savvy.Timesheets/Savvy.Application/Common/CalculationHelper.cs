@@ -1,6 +1,7 @@
 namespace Savvy.Application.Common;
 
 /// <summary>Centralizes assignment-mandated time and monetary rounding.</summary>
+/// <summary>Centralizes assignment-specific hours and currency rounding calculations.</summary>
 public static class CalculationHelper
 {
     public static decimal HoursWorked(DateTime startUtc, DateTime endUtc, int? unpaidBreakMinutes)

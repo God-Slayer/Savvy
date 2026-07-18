@@ -1,5 +1,6 @@
 namespace Savvy.Domain;
 
+/// <summary>Provides shared identity, audit timestamps, soft-delete, and concurrency fields.</summary>
 public abstract class BaseEntity
 {
     public Guid Id { get; set; } = Guid.NewGuid();

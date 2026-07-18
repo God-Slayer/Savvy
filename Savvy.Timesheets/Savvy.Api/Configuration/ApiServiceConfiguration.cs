@@ -6,6 +6,7 @@ using Savvy.Application.Timesheets;
 
 namespace Savvy.Api.Configuration;
 
+/// <summary>Registers API framework services, controllers, and shared infrastructure behavior.</summary>
 public static class ApiServiceConfiguration
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services)

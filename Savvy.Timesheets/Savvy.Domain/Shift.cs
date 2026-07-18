@@ -1,5 +1,6 @@
 namespace Savvy.Domain;
 
+/// <summary>Represents scheduled work assigned to one clinician at a practice.</summary>
 public sealed class Shift : BaseEntity
 {
     public Guid PracticeId { get; set; }

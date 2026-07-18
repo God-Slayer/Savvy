@@ -8,6 +8,7 @@ public sealed class TimesheetRepository(TimesheetsDbContext dbContext)
     : Repository<Timesheet>(dbContext),
         ITimesheetRepository
 {
+    /// <summary>Returns all timesheets for a practice without applying a status filter.</summary>
     public Task<IReadOnlyList<Timesheet>> GetByPracticeAsync(
         Guid practiceId,
         CancellationToken cancellationToken = default
@@ -16,6 +17,7 @@ public sealed class TimesheetRepository(TimesheetsDbContext dbContext)
         return GetByPracticeAsync(practiceId, null, cancellationToken);
     }
 
+    /// <summary>Finds a timesheet by its idempotency business reference.</summary>
     public Task<Timesheet?> GetByBusinessReferenceAsync(
         string businessReference,
         CancellationToken cancellationToken = default
@@ -29,6 +31,7 @@ public sealed class TimesheetRepository(TimesheetsDbContext dbContext)
             );
     }
 
+    /// <summary>Finds the timesheet associated with a shift, enforcing the one-per-shift rule.</summary>
     public Task<Timesheet?> GetByShiftIdAsync(
         Guid shiftId,
         CancellationToken cancellationToken = default
@@ -39,6 +42,7 @@ public sealed class TimesheetRepository(TimesheetsDbContext dbContext)
             .FirstOrDefaultAsync(timesheet => timesheet.ShiftId == shiftId, cancellationToken);
     }
 
+    /// <summary>Queries practice timesheets with an optional lifecycle status filter.</summary>
     public async Task<IReadOnlyList<Timesheet>> GetByPracticeAsync(
         Guid practiceId,
         TimesheetStatus? status = null,
@@ -58,6 +62,7 @@ public sealed class TimesheetRepository(TimesheetsDbContext dbContext)
             .ToListAsync(cancellationToken);
     }
 
+    /// <summary>Queries timesheets belonging to a clinician, optionally filtered by status.</summary>
     public async Task<IReadOnlyList<Timesheet>> GetByClinicianAsync(
         Guid clinicianId,
         TimesheetStatus? status,
@@ -77,6 +82,7 @@ public sealed class TimesheetRepository(TimesheetsDbContext dbContext)
             .ToListAsync(cancellationToken);
     }
 
+    /// <summary>Finds approved, unpaid timesheets whose worked dates fall inclusively within a payment period.</summary>
     public async Task<IReadOnlyList<Timesheet>> GetApprovedForPaymentAsync(
         Guid practiceId,
         DateOnly start,

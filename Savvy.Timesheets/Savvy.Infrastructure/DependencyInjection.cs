@@ -14,6 +14,7 @@ using Savvy.Infrastructure.Reporting;
 
 namespace Savvy.Infrastructure;
 
+/// <summary>Composes Infrastructure dependencies such as EF Core, repositories, authentication, and seeding.</summary>
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(

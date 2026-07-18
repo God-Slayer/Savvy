@@ -1,5 +1,6 @@
 namespace Savvy.Domain;
 
+/// <summary>Records the actual worked time submitted against exactly one shift.</summary>
 public sealed class Timesheet : BaseEntity
 {
     public Guid ShiftId { get; set; }

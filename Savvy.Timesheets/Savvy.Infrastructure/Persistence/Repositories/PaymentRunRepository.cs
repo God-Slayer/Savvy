@@ -8,6 +8,7 @@ public sealed class PaymentRunRepository(TimesheetsDbContext dbContext)
     : Repository<PaymentRun>(dbContext),
         IPaymentRunRepository
 {
+    /// <summary>Finds a payment run by its idempotency business reference.</summary>
     public Task<PaymentRun?> GetByBusinessReferenceAsync(
         string businessReference,
         CancellationToken cancellationToken = default
@@ -21,6 +22,7 @@ public sealed class PaymentRunRepository(TimesheetsDbContext dbContext)
             );
     }
 
+    /// <summary>Loads a payment run together with its line items and clinician details.</summary>
     public Task<PaymentRun?> GetByIdWithLinesAsync(
         Guid id,
         CancellationToken cancellationToken = default

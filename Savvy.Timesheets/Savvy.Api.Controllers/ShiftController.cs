@@ -6,6 +6,7 @@ using Savvy.Domain;
 namespace Savvy.Api.Controllers;
 
 [ApiController]
+/// <summary>Exposes shift scheduling and retrieval operations over HTTP.</summary>
 public sealed class ShiftController(IShiftService service) : ControllerBase
 {
     [HttpGet("api/practices/{practiceId:guid}/shifts")]

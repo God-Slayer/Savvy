@@ -6,6 +6,7 @@ namespace Savvy.Infrastructure.Reporting;
 
 public sealed class ReportingService(TimesheetsDbContext db) : IReportingService
 {
+    /// <summary>Builds a practice report containing timesheet status totals and overlapping payment runs for a UTC date range.</summary>
     public async Task<ReportSummary> GetSummaryAsync(
         Guid id,
         DateOnly from,

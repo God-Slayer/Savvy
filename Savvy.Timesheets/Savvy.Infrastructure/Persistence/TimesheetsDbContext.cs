@@ -3,6 +3,7 @@ using Savvy.Domain;
 
 namespace Savvy.Infrastructure.Persistence;
 
+/// <summary>Entity Framework database context for practices, users, shifts, timesheets, and payments.</summary>
 public sealed class TimesheetsDbContext(DbContextOptions<TimesheetsDbContext> options)
     : DbContext(options)
 {

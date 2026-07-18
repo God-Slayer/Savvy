@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Savvy.Api;
 
+/// <summary>Provides centralized request correlation and safe unhandled-exception logging.</summary>
 public sealed class OperationalMiddleware(
     RequestDelegate next,
     ILogger<OperationalMiddleware> logger

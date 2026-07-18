@@ -1,5 +1,6 @@
 namespace Savvy.Domain;
 
+/// <summary>Represents a practice payment batch and its calculated totals.</summary>
 public sealed class PaymentRun : BaseEntity
 {
     public Guid PracticeId { get; set; }

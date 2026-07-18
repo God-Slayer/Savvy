@@ -2,6 +2,7 @@ using Microsoft.OpenApi.Models;
 
 namespace Savvy.Api.Configuration;
 
+/// <summary>Configures Swagger/OpenAPI metadata and bearer-token support.</summary>
 public static class SwaggerConfiguration
 {
     public static IServiceCollection AddApiSwagger(this IServiceCollection services)

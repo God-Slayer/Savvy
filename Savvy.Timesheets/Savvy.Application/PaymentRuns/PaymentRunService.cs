@@ -11,6 +11,7 @@ public sealed class PaymentRunService(
     IUnitOfWork uow
 ) : IPaymentRunService
 {
+    /// <summary>Creates a payment run from eligible approved timesheets in the requested period and calculates its totals.</summary>
     public async Task<Result<PaymentRunResponseDto>> CreateAsync(
         Guid practiceId,
         PaymentRunCreateDto d,
@@ -96,6 +97,7 @@ public sealed class PaymentRunService(
         return Result<PaymentRunResponseDto>.Success(ToDto(run));
     }
 
+    /// <summary>Retrieves a payment run and its line items after enforcing practice access.</summary>
     public async Task<Result<PaymentRunResponseDto>> GetAsync(
         Guid id,
         CallerContext c,
@@ -113,6 +115,7 @@ public sealed class PaymentRunService(
         return Result<PaymentRunResponseDto>.Success(ToDto(r));
     }
 
+    /// <summary>Marks a draft payment run as processed without modifying its existing line items.</summary>
     public async Task<Result<PaymentRunResponseDto>> ProcessAsync(
         Guid id,
         CallerContext c,

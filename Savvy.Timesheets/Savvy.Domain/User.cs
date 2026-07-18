@@ -1,5 +1,6 @@
 namespace Savvy.Domain;
 
+/// <summary>Represents an authenticated user and their role and optional practice membership.</summary>
 public sealed class User : BaseEntity
 {
     public Guid? PracticeId { get; set; }

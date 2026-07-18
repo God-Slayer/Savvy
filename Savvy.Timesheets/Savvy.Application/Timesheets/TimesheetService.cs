@@ -11,6 +11,7 @@ public sealed class TimesheetService(
     IUnitOfWork uow
 ) : ITimesheetService
 {
+    /// <summary>Submits one clinician's worked times for a shift, enforcing one timesheet per shift and idempotent references.</summary>
     public async Task<Result<TimesheetResponseDto>> SubmitAsync(
         Guid shiftId,
         TimesheetSubmitDto dto,
@@ -73,6 +74,7 @@ public sealed class TimesheetService(
         return Result<TimesheetResponseDto>.Success(ToDto(t, shift));
     }
 
+    /// <summary>Retrieves a timesheet after checking whether the caller can access its clinician and practice scope.</summary>
     public async Task<Result<TimesheetResponseDto>> GetAsync(
         Guid id,
         CallerContext c,
@@ -92,6 +94,7 @@ public sealed class TimesheetService(
         return Result<TimesheetResponseDto>.Success(ToDto(t, s));
     }
 
+    /// <summary>Lists practice timesheets for administrators and managers, optionally filtered by status.</summary>
     public async Task<Result<IReadOnlyList<TimesheetResponseDto>>> ListByPracticeAsync(
         Guid practiceId,
         CallerContext c,
@@ -133,6 +136,7 @@ public sealed class TimesheetService(
         return Result<IReadOnlyList<TimesheetResponseDto>>.Success(response);
     }
 
+    /// <summary>Lists the authenticated clinician's own timesheets, optionally filtered by status.</summary>
     public async Task<Result<IReadOnlyList<TimesheetResponseDto>>> ListMineAsync(
         CallerContext c,
         string? status = null,
@@ -169,6 +173,7 @@ public sealed class TimesheetService(
         return Result<IReadOnlyList<TimesheetResponseDto>>.Success(response);
     }
 
+    /// <summary>Approves a submitted timesheet for a manager's practice and completes its approval transition.</summary>
     public async Task<Result<TimesheetResponseDto>> ApproveAsync(
         Guid id,
         CallerContext c,

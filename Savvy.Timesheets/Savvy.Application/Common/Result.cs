@@ -1,6 +1,7 @@
 namespace Savvy.Application.Common;
 
 /// <summary>Represents either a successful application result or a safe error.</summary>
+/// <summary>Represents either a successful application result or a safe business error.</summary>
 public sealed class Result<T>
 {
     private Result(T? value, string? errorCode, string? errorMessage)

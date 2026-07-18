@@ -1,5 +1,6 @@
 namespace Savvy.Domain;
 
+/// <summary>Represents a healthcare practice that owns shifts and payment runs.</summary>
 public sealed class Practice : BaseEntity
 {
     public string Name { get; set; } = string.Empty;

@@ -20,6 +20,7 @@ public sealed class UnitOfWork(
     public ITimesheetRepository Timesheets { get; } = timesheets;
     public IPaymentRunRepository PaymentRuns { get; } = paymentRuns;
 
+    /// <summary>Commits all tracked repository changes as one database operation.</summary>
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         return _dbContext.SaveChangesAsync(cancellationToken);

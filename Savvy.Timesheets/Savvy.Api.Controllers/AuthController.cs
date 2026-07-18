@@ -7,6 +7,7 @@ namespace Savvy.Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
+/// <summary>Exposes the anonymous login endpoint that issues JWT access tokens.</summary>
 public sealed class AuthController(IAuthenticationService authenticationService) : ControllerBase
 {
     [AllowAnonymous]

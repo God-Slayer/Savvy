@@ -8,6 +8,7 @@ public sealed class ShiftRepository(TimesheetsDbContext dbContext)
     : Repository<Shift>(dbContext),
         IShiftRepository
 {
+    /// <summary>Returns all shifts for a practice when no status filter is requested.</summary>
     public Task<IReadOnlyList<Shift>> ListByPracticeAsync(
         Guid practiceId,
         CancellationToken cancellationToken = default
@@ -16,6 +17,7 @@ public sealed class ShiftRepository(TimesheetsDbContext dbContext)
         return ListByPracticeAsync(practiceId, null, cancellationToken);
     }
 
+    /// <summary>Queries a practice's shifts with an optional open/completed status filter.</summary>
     public async Task<IReadOnlyList<Shift>> ListByPracticeAsync(
         Guid practiceId,
         ShiftStatus? status = null,
@@ -30,6 +32,7 @@ public sealed class ShiftRepository(TimesheetsDbContext dbContext)
             .ToListAsync(cancellationToken);
     }
 
+    /// <summary>Returns shifts assigned to a specific clinician in schedule order.</summary>
     public async Task<IReadOnlyList<Shift>> ListByClinicianAsync(
         Guid clinicianId,
         CancellationToken cancellationToken = default
@@ -43,6 +46,7 @@ public sealed class ShiftRepository(TimesheetsDbContext dbContext)
             .ToListAsync(cancellationToken);
     }
 
+    /// <summary>Loads one shift together with its practice, clinician, and timesheet details.</summary>
     public Task<Shift?> GetByIdWithDetailsAsync(
         Guid id,
         CancellationToken cancellationToken = default

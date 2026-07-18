@@ -8,16 +8,19 @@ namespace Savvy.Application.Shifts;
 /// <summary>Applies authorization and business rules for shift operations.</summary>
 public sealed class ShiftService(IUnitOfWork uow) : IShiftService
 {
+    /// <summary>Maps a domain shift to the API response contract.</summary>
     private static ShiftResponseDto Map(Shift shift)
     {
         return shift.Adapt<ShiftResponseDto>();
     }
 
+    /// <summary>Creates a consistent forbidden result for callers outside the permitted scope.</summary>
     private static Result<T> Deny<T>()
     {
         return Result<T>.Failure("forbidden", "You do not have access to this practice or shift.");
     }
 
+    /// <summary>Checks whether a caller may manage the specified practice.</summary>
     private static bool Manager(CallerContext caller, Guid practiceId)
     {
         return caller.Role == UserRole.Admin
@@ -180,6 +183,7 @@ public sealed class ShiftService(IUnitOfWork uow) : IShiftService
         return Result<bool>.Success(true);
     }
 
+    /// <summary>Compares a client-supplied concurrency token with the stored row version.</summary>
     private static bool TryVersion(string value, byte[] bytes)
     {
         try

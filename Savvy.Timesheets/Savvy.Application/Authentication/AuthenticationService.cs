@@ -9,6 +9,7 @@ public sealed class AuthenticationService(
     IAccessTokenGenerator accessTokenGenerator
 ) : IAuthenticationService
 {
+    /// <summary>Validates credentials and issues an access token for the authenticated user.</summary>
     public async Task<Result<LoginResponseDto>> LoginAsync(
         LoginRequestDto request,
         CancellationToken cancellationToken = default

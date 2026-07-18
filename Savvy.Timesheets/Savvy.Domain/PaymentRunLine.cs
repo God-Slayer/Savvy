@@ -1,5 +1,6 @@
 namespace Savvy.Domain;
 
+/// <summary>Captures the calculated gross, fee, and net amounts for one timesheet in a payment run.</summary>
 public sealed class PaymentRunLine : BaseEntity
 {
     public Guid PaymentRunId { get; set; }

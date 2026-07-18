@@ -8,6 +8,7 @@ using Savvy.Domain;
 namespace Savvy.Api.Controllers;
 
 [ApiController]
+/// <summary>Exposes payment batch creation, retrieval, and processing operations.</summary>
 public sealed class PaymentRunController(IPaymentRunService service) : ControllerBase
 {
     [HttpPost("api/practices/{practiceId:guid}/payment-runs")]

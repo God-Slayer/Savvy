@@ -6,6 +6,7 @@ using Savvy.Infrastructure.Authentication;
 
 namespace Savvy.Api.Configuration;
 
+/// <summary>Registers JWT authentication and authorization policies for the API.</summary>
 public static class AuthenticationConfiguration
 {
     public static IServiceCollection AddApiAuthentication(

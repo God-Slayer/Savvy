@@ -5,6 +5,7 @@ using Savvy.Domain;
 
 namespace Savvy.Application.Mapping;
 
+/// <summary>Defines mappings between domain entities and API response contracts.</summary>
 public static class MapsterConfiguration
 {
     public static IServiceCollection AddApplicationMappings(this IServiceCollection services)

@@ -12,6 +12,7 @@ public sealed class JwtAccessTokenGenerator(IOptions<JwtOptions> options) : IAcc
 {
     private readonly JwtOptions _options = options.Value;
 
+    /// <summary>Creates a signed JWT containing the user's identity, role, and optional practice scope.</summary>
     public AccessToken Generate(User user)
     {
         var expiresUtc = DateTime.UtcNow.AddMinutes(_options.ExpiryMinutes);

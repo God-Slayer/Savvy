@@ -8,6 +8,7 @@ using Savvy.Domain;
 namespace Savvy.Api.Controllers;
 
 [ApiController]
+/// <summary>Exposes timesheet submission, approval, retrieval, and listing operations.</summary>
 public sealed class TimesheetController(ITimesheetService service) : ControllerBase
 {
     [HttpPost("api/shifts/{shiftId:guid}/timesheet")]
