@@ -143,6 +143,14 @@ public sealed class DevelopmentDataSeeder(
         line.NetAmount = 360m;
         if (dbContext.Entry(line).State == EntityState.Detached)
             dbContext.PaymentRunLines.Add(line);
+
+        // A timesheet already represented by a payment-run line has been paid.
+        var paidTimesheet = await dbContext.Timesheets
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(x => x.Id == line.TimesheetId, cancellationToken);
+        if (paidTimesheet is not null)
+            paidTimesheet.Status = TimesheetStatus.Paid;
+
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 

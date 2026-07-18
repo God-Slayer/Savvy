@@ -32,30 +32,30 @@ public sealed class ShiftService(IUnitOfWork uow) : IShiftService
         CancellationToken ct = default
     )
     {
-        if (caller.Role == UserRole.Clinician)
-        {
-            var shifts = await uow.Shifts.ListByClinicianAsync(caller.UserId, ct);
-            return Result<IReadOnlyList<ShiftResponseDto>>.Success(
-                shifts.Where(x => x.PracticeId == practiceId).Select(Map).ToList()
-            );
-        }
-        if (!Manager(caller, practiceId))
-            return Deny<IReadOnlyList<ShiftResponseDto>>();
         ShiftStatus? parsedStatus = null;
         if (
             !string.IsNullOrWhiteSpace(status)
             && !status.Equals("all", StringComparison.OrdinalIgnoreCase)
-            && (!Enum.TryParse(status, true, out ShiftStatus value))
+            && !Enum.TryParse(status, true, out ShiftStatus value)
         )
             return Result<IReadOnlyList<ShiftResponseDto>>.Failure(
                 "validation",
                 "Invalid shift status. Use All, Open, or Completed."
             );
-        if (
-            !string.IsNullOrWhiteSpace(status)
-            && !status.Equals("all", StringComparison.OrdinalIgnoreCase)
-        )
+        if (!string.IsNullOrWhiteSpace(status) && !status.Equals("all", StringComparison.OrdinalIgnoreCase))
             parsedStatus = Enum.Parse<ShiftStatus>(status, true);
+
+        if (caller.Role == UserRole.Clinician)
+        {
+            var shifts = await uow.Shifts.ListByClinicianAsync(caller.UserId, ct);
+            return Result<IReadOnlyList<ShiftResponseDto>>.Success(
+                shifts.Where(x => x.PracticeId == practiceId && (parsedStatus is null || x.Status == parsedStatus))
+                    .Select(Map)
+                    .ToList()
+            );
+        }
+        if (!Manager(caller, practiceId))
+            return Deny<IReadOnlyList<ShiftResponseDto>>();
         var practiceShifts = await uow.Shifts.ListByPracticeAsync(practiceId, parsedStatus, ct);
         return Result<IReadOnlyList<ShiftResponseDto>>.Success(practiceShifts.Select(Map).ToList());
     }
