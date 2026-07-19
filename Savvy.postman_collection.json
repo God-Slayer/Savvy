@@ -1,19 +1,780 @@
 {
-  "info":{"name":"Savvy API","schema":"https://schema.getpostman.com/json/collection/v2.1.0/collection.json"},
-  "variable":[{"key":"baseUrl","value":"https://localhost:7026"}],
-  "item":[
-    {"name":"Auth - Admin","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"email\":\"admin@savvy.local\",\"password\":\"SavvyDemo!2026#LocalDB\"}"},"url":"{{baseUrl}}/api/auth/login"},"event":[{"listen":"test","script":{"exec":["pm.test('Login succeeds',()=>pm.expect(pm.response.code).to.be.oneOf([200,201]));","if(pm.response.code===200){pm.environment.set('adminToken',pm.response.json().accessToken);}"],"type":"text/javascript"}}]},
-    {"name":"Auth - Manager","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"email\":\"manager@savvy.local\",\"password\":\"SavvyDemo!2026#LocalDB\"}"},"url":"{{baseUrl}}/api/auth/login"},"event":[{"listen":"test","script":{"exec":["pm.test('Login succeeds',()=>pm.expect(pm.response.code).to.be.oneOf([200,201]));","if(pm.response.code===200){let t=pm.response.json().accessToken;pm.environment.set('managerToken',t);let p=JSON.parse(atob(t.split('.')[1]));pm.environment.set('practiceId',p.practice_id);}"],"type":"text/javascript"}}]},
-    {"name":"Auth - Clinician","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"email\":\"clinician@savvy.local\",\"password\":\"SavvyDemo!2026#LocalDB\"}"},"url":"{{baseUrl}}/api/auth/login"},"event":[{"listen":"test","script":{"exec":["pm.test('Login succeeds',()=>pm.expect(pm.response.code).to.be.oneOf([200,201]));","if(pm.response.code===200){pm.environment.set('clinicianToken',pm.response.json().accessToken);}"],"type":"text/javascript"}}]},
-    {"name":"List shifts","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{managerToken}}"}],"url":"{{baseUrl}}/api/practices/{{practiceId}}/shifts"},"event":[{"listen":"test","script":{"exec":["pm.test('Shift list succeeds',()=>pm.expect(pm.response.code).to.equal(200));","if(pm.response.code===200){let a=pm.response.json();let x=Array.isArray(a)?a[0]:a.value?.[0];if(x)pm.environment.set('shiftId',x.id);}"],"type":"text/javascript"}}]},
-    {"name":"Get shift","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{managerToken}}"}],"url":"{{baseUrl}}/api/shifts/{{shiftId}}"}},
-    {"name":"Submit timesheet","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{clinicianToken}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"businessReference\":\"{{$guid}}\",\"actualStartUtc\":\"2026-07-20T08:00:00Z\",\"actualEndUtc\":\"2026-07-20T16:00:00Z\",\"unpaidBreakMinutes\":30,\"notes\":\"Postman demo\"}"},"url":"{{baseUrl}}/api/shifts/{{shiftId}}/timesheet"}},
-    {"name":"Get timesheet","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{managerToken}}"}],"url":"{{baseUrl}}/api/timesheets/{{timesheetId}}"}},
-    {"name":"Approve timesheet","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{managerToken}}"}],"url":"{{baseUrl}}/api/timesheets/{{timesheetId}}/approve"}},
-    {"name":"Create payment run","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{managerToken}}"},{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"businessReference\":\"{{$guid}}\",\"periodStartDate\":\"2026-07-01\",\"periodEndDate\":\"2026-07-31\",\"percentageFeeRate\":0,\"fixedFeeAmount\":0,\"currency\":\"GBP\"}"},"url":"{{baseUrl}}/api/practices/{{practiceId}}/payment-runs"}},
-    {"name":"Get payment run","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{managerToken}}"}],"url":"{{baseUrl}}/api/payment-runs/{{paymentRunId}}"}},
-    {"name":"Process payment run","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{managerToken}}"}],"url":"{{baseUrl}}/api/payment-runs/{{paymentRunId}}/process"}},
-    {"name":"Reporting summary","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{managerToken}}"}],"url":"{{baseUrl}}/api/practices/{{practiceId}}/reports/summary?from=2026-07-01&to=2026-07-31"}},
-    {"name":"Unauthorized check","request":{"method":"GET","url":"{{baseUrl}}/api/practices/{{practiceId}}/shifts"},"event":[{"listen":"test","script":{"exec":["pm.test('Unauthorized is rejected',()=>pm.expect(pm.response.code).to.equal(401));"],"type":"text/javascript"}}]}
+  "info": {
+    "_postman_id": "2b6bb36f-7823-41ad-b376-09991781e54c",
+    "name": "Savvy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12790370"
+  },
+  "item": [
+    {
+      "name": "Login Admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 login',()=>pm.expect(pm.response.code).to.equal(200));",
+              "if(pm.response.code===200)pm.collectionVariables.set('authToken',pm.response.json().accessToken);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"admin@savvy.local\",\r\n    \"password\": \"SavvyDemo!2026#LocalDB\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login Manager",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 login',()=>pm.expect(pm.response.code).to.equal(200));",
+              "if(pm.response.code===200){let t=pm.response.json().accessToken;pm.collectionVariables.set('authToken',t);let p=JSON.parse(atob(t.split('.')[1]));pm.collectionVariables.set('practiceId',p.practice_id);}"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"manager@savvy.local\",\r\n    \"password\": \"SavvyDemo!2026#LocalDB\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login Clinician",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 login',()=>pm.expect(pm.response.code).to.equal(200));",
+              "if(pm.response.code===200)pm.collectionVariables.set('authToken',pm.response.json().accessToken);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"clinician@savvy.local\",\r\n    \"password\": \"SavvyDemo!2026#LocalDB\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Shift",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/shifts/{{shiftId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "shifts",
+            "{{shiftId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Shifts",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/practices/{{practiceId}}/shifts?status=open",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "practices",
+            "{{practiceId}}",
+            "shifts"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "all",
+              "description": "Filter shifts by all",
+              "disabled": true
+            },
+            {
+              "key": "status",
+              "value": "open",
+              "description": "Filter shifts by open"
+            },
+            {
+              "key": "status",
+              "value": "completed",
+              "description": "Filter shifts by completed",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Shift",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"clinicianId\": \"{{clinicianId}}\",\r\n    \"scheduledStartUtc\": \"2026-07-19T08:00:00Z\",\r\n    \"scheduledEndUtc\": \"2026-07-19T17:00:00Z\",\r\n    \"role\": \"Dental Clinician\",\r\n    \"location\": \"Savvy Dental - Main\",\r\n    \"hourlyRate\": 45\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/practices/{{practiceId}}/shifts",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "practices",
+            "{{practiceId}}",
+            "shifts"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Shift",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Shift update succeeds or conflicts safely',()=>pm.expect(pm.response.code).to.be.oneOf([200,409]));",
+              "if(pm.response.code===200&&pm.response.json().rowVersion)pm.collectionVariables.set('shiftRowVersion',pm.response.json().rowVersion);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"scheduledStartUtc\": \"2026-08-01T08:00:00Z\",\r\n    \"scheduledEndUtc\": \"2026-08-01T16:00:00Z\",\r\n    \"role\": \"Clinician\",\r\n    \"location\": \"Main\",\r\n    \"hourlyRate\": 46,\r\n    \"rowVersion\": \"{{shiftRowVersion}}\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/shifts/{{shiftId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "shifts",
+            "{{shiftId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Shift",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Shift delete returns expected result',()=>pm.expect(pm.response.code).to.be.oneOf([200,204,404,409]));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/shifts/{{shiftId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "shifts",
+            "{{shiftId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Timesheet",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/timesheets/{{timesheetId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "timesheets",
+            "{{timesheetId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Practice Timesheets",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Practice timesheet list succeeds',()=>pm.expect(pm.response.code).to.equal(200));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{authToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/practices/{{practiceId}}/timesheets?status=submitted",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "practices",
+            "{{practiceId}}",
+            "timesheets"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "all",
+              "description": "Filter timesheets by all",
+              "disabled": true
+            },
+            {
+              "key": "status",
+              "value": "submitted",
+              "description": "Filter timesheets by submitted"
+            },
+            {
+              "key": "status",
+              "value": "approved",
+              "description": "Filter timesheets by approved",
+              "disabled": true
+            },
+            {
+              "key": "status",
+              "value": "paid",
+              "description": "Filter timesheets by paid",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List My Timesheets",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Clinician timesheet list succeeds',()=>pm.expect(pm.response.code).to.equal(200));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{authToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/me/timesheets?status=submitted",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "me",
+            "timesheets"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "all",
+              "description": "Filter timesheets by all",
+              "disabled": true
+            },
+            {
+              "key": "status",
+              "value": "submitted",
+              "description": "Filter timesheets by submitted",
+              "type": "text"
+            },
+            {
+              "key": "status",
+              "value": "approved",
+              "description": "Filter timesheets by approved",
+              "disabled": true
+            },
+            {
+              "key": "status",
+              "value": "paid",
+              "description": "Filter timesheets by paid",
+              "type": "text",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Timesheet",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "if(!pm.collectionVariables.get('timesheetReference'))pm.collectionVariables.set('timesheetReference',pm.variables.replaceIn('{{$guid}}'))"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Created or idempotent',()=>pm.expect(pm.response.code).to.be.oneOf([200,201]));",
+              "if([200,201].includes(pm.response.code)&&pm.response.json().id)pm.collectionVariables.set('timesheetId',pm.response.json().id);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{clinicianToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"businessReference\": \"{{timesheetReference}}\",\r\n    \"actualStartUtc\": \"2026-07-19T08:00:00Z\",\r\n    \"actualEndUtc\": \"2026-07-19T17:00:00Z\",\r\n    \"unpaidBreakMinutes\": 0,\r\n    \"notes\": \"DEMO-TS-002\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/shifts/{{shiftId}}/timesheet",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "shifts",
+            "{{shiftId}}",
+            "timesheet"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Approve Timesheet",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/timesheets/{{timesheetId}}/approve",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "timesheets",
+            "{{timesheetId}}",
+            "approve"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Payment Run",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/payment-runs/{{paymentRunId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "payment-runs",
+            "{{paymentRunId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Payment Run",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "if(!pm.collectionVariables.get('paymentRunReference'))pm.collectionVariables.set('paymentRunReference',pm.variables.replaceIn('{{$guid}}'))"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Created or idempotent',()=>pm.expect(pm.response.code).to.be.oneOf([200,201]));",
+              "if([200,201].includes(pm.response.code)&&pm.response.json().id)pm.collectionVariables.set('paymentRunId',pm.response.json().id);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"businessReference\": \"{{paymentRunReference}}\",\r\n    \"periodStartDate\": \"2026-07-01\",\r\n    \"periodEndDate\": \"2026-07-31\",\r\n    \"percentageFeeRate\": 10,\r\n    \"fixedFeeAmount\": 0,\r\n    \"currency\": \"GBP\"\r\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/practices/{{practiceId}}/payment-runs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "practices",
+            "{{practiceId}}",
+            "payment-runs"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Process Payment Run",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/payment-runs/{{paymentRunId}}/process",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "payment-runs",
+            "{{paymentRunId}}",
+            "process"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Reporting Summary",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{managerToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/practices/{{practiceId}}/reports/summary?from=2026-07-01&to=2026-07-31",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "practices",
+            "{{practiceId}}",
+            "reports",
+            "summary"
+          ],
+          "query": [
+            {
+              "key": "from",
+              "value": "2026-07-01"
+            },
+            {
+              "key": "to",
+              "value": "2026-07-31"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:7026"
+    },
+    {
+      "key": "authToken",
+      "secret": true
+    },
+    {
+      "key": "practiceId",
+      "value": "8950DA2B-112B-4F24-B48D-B85451E9FE62"
+    },
+    {
+      "key": "clinicianId",
+      "value": "1B1F87E4-B716-4B44-9CC0-D761F635275B"
+    },
+    {
+      "key": "shiftId",
+      "value": "80FD2584-0AAF-4658-971D-2801A9BE7022"
+    },
+    {
+      "key": "timesheetId",
+      "value": "65612B57-3A67-4B3D-8B08-FA011FC161BA"
+    },
+    {
+      "key": "paymentRunId",
+      "value": "D1E5D67A-4811-48F7-9C5C-C55742E692EF"
+    },
+    {
+      "key": "timesheetReference",
+      "value": ""
+    },
+    {
+      "key": "paymentRunReference",
+      "value": ""
+    }
   ]
 }
